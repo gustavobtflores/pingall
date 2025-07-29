@@ -8,8 +8,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.pingall.R
 import com.example.pingall.entities.PingResult
 
-class PingsResultAdapter(private val pingsList: List<PingResult>) :
-    RecyclerView.Adapter<PingsResultAdapter.PingsViewHolder>() {
+class PingsResultAdapter : RecyclerView.Adapter<PingsResultAdapter.PingsViewHolder>() {
+
+    private val pingsList = mutableListOf<PingResult>()
+
     class PingsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val pingUrl: TextView = itemView.findViewById(R.id.pingUrl);
         val responseTime: TextView = itemView.findViewById(R.id.pingResponseTime);
@@ -25,8 +27,20 @@ class PingsResultAdapter(private val pingsList: List<PingResult>) :
     }
 
     override fun onBindViewHolder(holder: PingsViewHolder, position: Int) {
-        val ping = pingsList[position];
-        holder.pingUrl.text = ping.url;
-        holder.responseTime.text = "${ping.responseTime.toString()}ms";
+        val ping = pingsList[position]
+        holder.pingUrl.text = ping.url
+
+        val responseTimeValue = ping.responseTime
+        if (responseTimeValue != null) {
+            holder.responseTime.text = "${responseTimeValue}ms"
+        } else {
+            holder.responseTime.text = "Pinging..."
+        }
+    }
+
+    fun updateList(newList: List<PingResult>) {
+        pingsList.clear()
+        pingsList.addAll(newList)
+        notifyDataSetChanged()
     }
 }

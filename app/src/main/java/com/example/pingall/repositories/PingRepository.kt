@@ -1,29 +1,37 @@
 package com.example.pingall.repositories
 
+import android.util.Log
 import com.example.pingall.entities.PingResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.net.HttpURLConnection
-import java.net.URL
+import java.io.IOException
 
 object PingRepository {
-    suspend fun ping(url: String): PingResult {
+    suspend fun ping(host: String): PingResult {
         return withContext(Dispatchers.IO) {
             try {
-                val start = System.currentTimeMillis();
-                val connection = URL(url).openConnection() as HttpURLConnection;
-                connection.connectTimeout = 1000;
-                connection.readTimeout = 1000;
+                val command = "ping -c 1 -W 1 $host"
+                Log.d("PingRepo", "Executando comando: $command")
 
-                connection.connect();
+                val startTime = System.currentTimeMillis()
+                val process = Runtime.getRuntime().exec(command)
 
-                connection.inputStream.close();
+                val exitCode = process.waitFor()
+                val endTime = System.currentTimeMillis()
 
-                val elapsed = System.currentTimeMillis() - start;
+                Log.d("PingRepo", "Código de saída: $exitCode")
 
-                PingResult(url, elapsed);
-            } catch (err: Exception) {
-                PingResult(url, null);
+                if (exitCode == 0) {
+                    val elapsedTime = endTime - startTime
+                    Log.d("PingRepo", "Ping para $host OK: $elapsedTime ms")
+                    PingResult(host, elapsedTime)
+                } else {
+                    Log.d("PingRepo", "Ping para $host falhou.")
+                    PingResult(host, null)
+                }
+            } catch (e: IOException) {
+                Log.e("PingRepo", "Erro ao fazer ping para $host", e)
+                PingResult(host, null)
             }
         }
     }
