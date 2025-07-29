@@ -41,5 +41,6 @@ class PingsResultAdapter : RecyclerView.Adapter<PingsResultAdapter.PingsViewHold
     fun updateList(newList: List<PingResult>) {
         pingsList.clear()
         pingsList.addAll(newList)
+        notifyDataSetChanged()
     }
 }
