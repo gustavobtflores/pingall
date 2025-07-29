@@ -2,14 +2,22 @@ package com.example.pingall
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.viewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.ListAdapter
 import com.example.pingall.adapters.PingsResultAdapter
 import com.example.pingall.databinding.ActivityMainBinding
-import com.example.pingall.entities.PingResult
+import com.example.pingall.viewmodel.PingViewModel
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var binding: ActivityMainBinding;
+
+    private val viewModel: PingViewModel by viewModels()
+    private lateinit var pingsAdapter: PingsResultAdapter
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -17,22 +25,38 @@ class MainActivity : ComponentActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater);
         setContentView(binding.root);
 
-//        val urls = listOf(
-//            "google.com",
-//            "reddit.com",
-//            "twitch.tv"
-//        )
+        setupRecyclerView()
+        setupAddButtonListener()
+        observeViewModel()
+    }
 
-        val pingsList = listOf(
-            PingResult("google.com", 100),
-            PingResult("reddit.com", 100),
-            PingResult("twitch.tv", 100)
-        )
+    fun setupRecyclerView(){
+        pingsAdapter = PingsResultAdapter()
+        binding.pingsRecyler.apply {
+            adapter = pingsAdapter
+            layoutManager = LinearLayoutManager(this@MainActivity)
+        }
 
-        val recyclerView = binding.pingsRecyler;
-        val pingsAdapter = PingsResultAdapter(pingsList);
+    }
 
-        recyclerView.adapter = pingsAdapter;
-        recyclerView.layoutManager = LinearLayoutManager(this);
+    private fun setupAddButtonListener() {
+        binding.button.setOnClickListener {
+            val urlText = binding.editTextText.text.toString().trim()
+
+            if (urlText.isNotBlank()) {
+                viewModel.addUrlToPing(urlText)
+                binding.editTextText.text.clear()
+            }
+        }
+    }
+
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.pingResults.collect { updatedList ->
+                    pingsAdapter.updateList(updatedList)
+                }
+            }
+        }
     }
 }
