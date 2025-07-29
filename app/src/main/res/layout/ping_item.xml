@@ -9,8 +9,8 @@
         android:id="@+id/pingUrl"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:layout_marginEnd="8dp"
+        android:layout_weight="1"
         android:text="URL" />
 
     <TextView
@@ -19,5 +19,12 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:text="Response Time" />
+
+    <Button
+        android:id="@+id/buttonremover"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Remover" />
 
 </LinearLayout>

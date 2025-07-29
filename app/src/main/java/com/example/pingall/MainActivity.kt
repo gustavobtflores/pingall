@@ -9,11 +9,13 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.pingall.adapters.PingsResultAdapter
 import com.example.pingall.databinding.ActivityMainBinding
+import com.example.pingall.databinding.PingItemBinding
 import com.example.pingall.viewmodel.PingViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private lateinit var binding: ActivityMainBinding;
+    private lateinit var itemBinding: PingItemBinding;
 
     private val viewModel: PingViewModel by viewModels()
     private lateinit var pingsAdapter: PingsResultAdapter
@@ -30,13 +32,15 @@ class MainActivity : ComponentActivity() {
         observeViewModel()
     }
 
-    fun setupRecyclerView(){
-        pingsAdapter = PingsResultAdapter()
+    private fun setupRecyclerView() {
+        pingsAdapter = PingsResultAdapter { pingToRemove ->
+            viewModel.removePing(pingToRemove)
+        }
+
         binding.pingsRecyler.apply {
             adapter = pingsAdapter
             layoutManager = LinearLayoutManager(this@MainActivity)
         }
-
     }
 
     private fun setupAddButtonListener() {

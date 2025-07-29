@@ -9,6 +9,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class PingViewModel : ViewModel() {
@@ -46,4 +47,10 @@ class PingViewModel : ViewModel() {
             }
         }
     }
+    fun removePing(ping: PingResult) {
+        _pingResults.update { currentList ->
+            currentList.filterNot { it.url == ping.url }
+        }
+    }
+
 }
