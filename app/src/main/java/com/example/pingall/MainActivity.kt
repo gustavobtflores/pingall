@@ -32,9 +32,9 @@ class MainActivity : ComponentActivity() {
         observeViewModel()
     }
 
-    private fun setupRecyclerView() {
-        pingsAdapter = PingsResultAdapter { pingToRemove ->
-            viewModel.removePing(pingToRemove)
+    fun setupRecyclerView() {
+        pingsAdapter = PingsResultAdapter { hostToRemove ->
+            viewModel.removeUrl(hostToRemove)
         }
 
         binding.pingsRecyler.apply {

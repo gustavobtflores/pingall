@@ -11,24 +11,16 @@ import com.example.pingall.R
 import com.example.pingall.entities.PingResult
 
 class PingsResultAdapter(
-    private val onRemoveClick: (PingResult) -> Unit
+    private val onRemoveClicked: (String) -> Unit
 ) : RecyclerView.Adapter<PingsResultAdapter.PingsViewHolder>() {
+
 
     private val pingsList = mutableListOf<PingResult>()
 
-    inner class PingsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class PingsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val pingUrl: TextView = itemView.findViewById(R.id.pingUrl)
         val responseTime: TextView = itemView.findViewById(R.id.pingResponseTime)
-        val buttonRemover: Button = itemView.findViewById(R.id.buttonremover)
-
-        fun bind(ping: PingResult) {
-            pingUrl.text = ping.url
-            responseTime.text = ping.responseTime?.let { "${it}ms" } ?: "Pinging..."
-            buttonRemover.setOnClickListener {
-                onRemoveClick(ping)
-                removeItem(ping)
-            }
-        }
+        val removeButton: View = itemView.findViewById(R.id.buttonremover)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PingsViewHolder {
@@ -37,8 +29,21 @@ class PingsResultAdapter(
     }
 
     override fun onBindViewHolder(holder: PingsViewHolder, position: Int) {
-        holder.bind(pingsList[position])
+        val ping = pingsList[position]
+        holder.pingUrl.text = ping.url
+
+        val responseTimeValue = ping.responseTime
+        if (responseTimeValue != null) {
+            holder.responseTime.text = "${responseTimeValue}ms"
+        } else {
+            holder.responseTime.text = "Pinging..."
+        }
+
+        holder.removeButton.setOnClickListener {
+            onRemoveClicked(ping.url)
+        }
     }
+
 
     override fun getItemCount(): Int = pingsList.size
 
@@ -47,12 +52,6 @@ class PingsResultAdapter(
         pingsList.addAll(newList)
         notifyDataSetChanged()
     }
-    fun removeItem(ping: PingResult) {
-        val index = pingsList.indexOfFirst { it.url == ping.url }
-        if (index != -1) {
-            pingsList.removeAt(index)
-            notifyItemRemoved(index)
-        }
-    }
+
 
 }

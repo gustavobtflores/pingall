@@ -47,10 +47,8 @@ class PingViewModel : ViewModel() {
             }
         }
     }
-    fun removePing(ping: PingResult) {
-        _pingResults.update { currentList ->
-            currentList.filterNot { it.url == ping.url }
-        }
+    fun removeUrl(host: String) {
+        urlsToPing.remove(host)
     }
 
 }
